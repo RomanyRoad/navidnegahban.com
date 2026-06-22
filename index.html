@@ -1244,8 +1244,19 @@ footer a:hover{color:var(--gold)}
 
 <script>
 // ── OVERLAY HELPERS ──
-function openOverlay(id){const el=document.getElementById(id);if(el){el.classList.add('open');document.body.style.overflow='hidden'}}
-function closeOverlay(id){const el=document.getElementById(id);if(el){el.classList.remove('open');document.body.style.overflow=''}}
+const PANEL_HASH={'press-overlay':'press','interviews-overlay':'interviews','epk-overlay':'epk'};
+function openOverlay(id){const el=document.getElementById(id);if(el){el.classList.add('open');document.body.style.overflow='hidden';if(PANEL_HASH[id])history.replaceState(null,'','#'+PANEL_HASH[id]);}}
+function closeOverlay(id){const el=document.getElementById(id);if(el){el.classList.remove('open');document.body.style.overflow='';if(PANEL_HASH[id]&&location.hash==='#'+PANEL_HASH[id])history.replaceState(null,'',location.pathname);}}
+// ── OPEN PANEL / SCROLL FROM URL HASH ON LOAD ──
+function handleHashLink(){
+  const h=location.hash;
+  if(!h)return;
+  const PANEL={'#press':'press-overlay','#interviews':'interviews-overlay','#epk':'epk-overlay'};
+  if(PANEL[h]){setTimeout(()=>openOverlay(PANEL[h]),300);return;}
+  if(h==='#showreel-section'){setTimeout(scrollToReel,300);return;}
+  if(h==='#filmography'){setTimeout(scrollToCredits,300);return;}
+}
+window.addEventListener('load',handleHashLink);
 function closeMobileMenu(){const m=document.getElementById('mobileMenu');if(m)m.classList.remove('open');document.body.style.overflow=''}
 
 // ── PRESS & INTERVIEWS POPUP LISTENERS ──
@@ -1292,6 +1303,7 @@ function scrollToCredits(){
   const top=section.getBoundingClientRect().top+window.scrollY;
   const offset=window.innerWidth<900?52:0;
   window.scrollTo({top:top-offset,behavior:'smooth'});
+  history.replaceState(null,'','#filmography');
   const d=document.getElementById("filmDetail");
   if(!d.style.height||d.style.height==="0px"){setTimeout(()=>filmOpen(),200);}
 }
@@ -1301,6 +1313,7 @@ function scrollToReel(){
   const top=section.getBoundingClientRect().top+window.scrollY;
   const offset=window.innerWidth<900?52:0;
   window.scrollTo({top:top-offset,behavior:'smooth'});
+  history.replaceState(null,'','#showreel-section');
 }
 
 // ── STATS COUNT UP ──
